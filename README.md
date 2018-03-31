@@ -1,4 +1,4 @@
-# Cryptocial
+# Cryptocial [![Build Status](https://travis-ci.org/tugcanolgun/SWE573.svg?branch=master)](https://travis-ci.org/tugcanolgun/SWE573)
 Cryptocial is rather experimental tweeter & cryptocurrency correlation analyzer. This project is being build for the SWE573 class in Bogazici University under the supervision of Prof. Dr. Suzan Uskudarli.
 
 ## Idea
