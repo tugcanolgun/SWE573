@@ -1,0 +1,6 @@
+No script in this folder is being run by Django.
+
+run is to call crypto script.
+
+crypto script gets the daily favorite 50 cryptocurrencies and add them to the database if they are not already added. Then twitter authentication is being run with the necessary authentication keys which are being fetched from environment variables. Each newly added 50 cryptocurrency name is used as a hashtag and 300 tweets are fetched. Because there is a rate limit for twitter API, fetching is done with certain intervals.
+
