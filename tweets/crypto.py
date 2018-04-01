@@ -131,3 +131,4 @@ class Twitter:
             sleep(90)
         logger.info("Tweets are added")
         CURRENCIES = []
+        self.conn.close()
