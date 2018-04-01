@@ -1,9 +1,0 @@
-attrs==17.4.0
-Django==2.0.3
-more-itertools==4.1.0
-nltk==3.2.5
-pluggy==0.6.0
-py==1.5.3
-pytest==3.5.0
-pytz==2018.3
-six==1.11.0

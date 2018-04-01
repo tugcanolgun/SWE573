@@ -3,6 +3,6 @@ python:
     - "3.6"
 
 install:
-    - pip install -r requirements.txt
+    - pip install -r cryptocial/requirements.txt
 
 script: pytest

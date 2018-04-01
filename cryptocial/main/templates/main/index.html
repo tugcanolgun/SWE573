@@ -1,0 +1,6 @@
+{% if cr_list %}
+{% for crypto in cr_list %}
+    <a href="{% url 'main:detail' crypto.id %}" > {{ crypto.name }}</a><br>
+{% endfor %}
+{% endif %}
+
