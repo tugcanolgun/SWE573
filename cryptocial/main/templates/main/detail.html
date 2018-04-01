@@ -1,2 +1,23 @@
-{{ crypto.name }}
-{{ crypto.short_name }}
+
+<head>
+	<title>This</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js" type="application/javascript"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>-->
+</head>
+
+<body>
+    <canvas id="result_chart" width="800" height="450"></canvas>
+</body>
+ <script src="http://yourjavascript.com/412734182/draw.js" type="application/javascript"></script>
+<script>
+        var res = "{{ result }}";
+        if (res !== "") {
+            drawChart(res);
+        }
+
+        else
+        {
+            drawEmptyChart();
+        }
+    </script>
+</html>

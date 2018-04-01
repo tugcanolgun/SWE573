@@ -16,11 +16,11 @@ class SentimentAnalysis:
     def __init__(self, currency: str):
         if not isinstance(currency, str):
             return
-        logger.info("Sentiment analysis has started. %s", self.currency)
         self.currency = currency
+        logger.info("Sentiment analysis has started. %s", self.currency)
         self.tweets = {}
         self.results = {}
-        self.conn = sqlite3.connect("tweets.sqlite3")
+        self.conn = sqlite3.connect("../database/tweets.sqlite3")
         self.cursor = self.conn.cursor()
 
 

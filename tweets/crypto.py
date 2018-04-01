@@ -25,7 +25,7 @@ CURRENCIES = []
 class Cryptocurrency:
     def __init__(self):
         logger.info("Initializing crypto...")
-        self.conn = sqlite3.connect("tweets.sqlite3")
+        self.conn = sqlite3.connect("../database/tweets.sqlite3")
         self.cursor = self.conn.cursor()
 
     def __get_id(self, currency: str) -> int:
@@ -74,7 +74,7 @@ class Twitter:
     def __init__(self):
         logger.info("Initializing twitter...")
         self.api = None
-        self.conn = sqlite3.connect("tweets.sqlite3")
+        self.conn = sqlite3.connect("../database/tweets.sqlite3")
         self.cursor = self.conn.cursor()
 
 
@@ -128,6 +128,7 @@ class Twitter:
                 logger.error(str(err))
             except:
                 logger.error("Something went wrong")
+            system("python3.6 sentiment.py --coin %s &" % currency)
             sleep(90)
         logger.info("Tweets are added")
         CURRENCIES = []
