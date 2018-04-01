@@ -2,7 +2,7 @@
 Cryptocial is rather experimental tweeter & cryptocurrency correlation analyzer. This project is being build for the SWE573 class in Bogazici University under the supervision of Prof. Dr. Suzan Uskudarli.
 
 ## Idea
-The main purpose of this project is to find a correlation between cryptocurrency prices and twitter chatter. The trends of cryptocurrencies with different date ranges and frequencies will be analyzed and depending on the sedimental analysis of the given cryptocurrency results, analysis will be carried.
+The main purpose of this project is to find a correlation between cryptocurrency prices and twitter chatter. The trends of cryptocurrencies with different date ranges and frequencies will be analyzed and depending on the sentiment analysis of the given cryptocurrency results, analysis will be carried.
 
 ### Libraries and languages
 For backend services Python 3.6 will be used along with Django 2.0.2.
