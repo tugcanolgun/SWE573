@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from pathlib import Path
 # from django.template import loader
 # from django.urls import reverse
@@ -39,7 +39,7 @@ def detail(request, crypto_id):
     id = cursor.fetchone()
     if not id:
         # Put an error page here
-        raise Http404
+        return HttpResponse("Id could not be found")
     else:
         id = id[0]
     sentiment = []
