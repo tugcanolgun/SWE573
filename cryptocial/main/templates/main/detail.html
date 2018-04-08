@@ -1,23 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+{{ crypto.name }}
+{% endblock %}
 
-<head>
-	<title>This</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js" type="application/javascript"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>-->
-</head>
+{% block content %}
+    <div class="container">
+        <canvas id="result_chart"></canvas>
+        <br>
+        {{ high }}
+        {{ low }}
+        <div class="card text-center">
+            <div class="card-header">
+                <img src="https://raw.githubusercontent.com/cjdowner/cryptocurrency-icons/master/128/icon/{{ crypto.short_name|lower }}.png">
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ crypto.name }}</h5>
+            </div>
+            <div class="card-footer text-muted">
+                Correlation data has not been calculated yet. Please check later.
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
-<body>
-    <canvas id="result_chart" width="800" height="450"></canvas>
-</body>
- <script src="http://yourjavascript.com/412734182/draw.js" type="application/javascript"></script>
-<script>
-        var res = "{{ result }}";
-        if (res !== "") {
-            drawChart(res);
-        }
-
-        else
-        {
-            drawEmptyChart();
-        }
-    </script>
-</html>

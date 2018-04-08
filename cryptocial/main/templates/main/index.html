@@ -1,5 +1,5 @@
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{% extends 'base.html' %}
+{% block content %}
 <div align="center">
 <div class="jumbotron">
   <h1>Cryptocial</h1>
@@ -10,10 +10,13 @@
 
     {% if cr_list %}
     {% for crypto in cr_list %}
-    <a href="{% url 'main:detail' crypto.id %}" > {{ crypto.name }}</a><br>
+    <a href="{% url 'main:detail' crypto.id %}" >
+      <img src="https://raw.githubusercontent.com/cjdowner/cryptocurrency-icons/master/128/icon/{{ crypto.short_name|lower }}.png">
+    </a><br>
+      <a href="{% url 'main:detail' crypto.id %}" >{{crypto.name}}</a><br>
     {% endfor %}
     {% endif %}
   </div>
 </div>
 </div>
-
+{% endblock %}

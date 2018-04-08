@@ -1,0 +1,88 @@
+{% load static %}
+
+<head>
+    <title>Cryptocial {% block title %}{% endblock %}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js" type="application/javascript"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>-->
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+    <a class="navbar-brand" href="/"><img src="{% static "images/coin.png" %}" alt="icon"/> Cryptocial</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+        </div>
+    </div>
+</nav>
+
+<!-- Content -->
+{% block content %}
+{% endblock %}
+
+
+<!--Footer-->
+    <div class="font-small bg-light pt-4 mt-4">
+    <!--Footer Links-->
+    <div class="container-fluid text-center text-md-left">
+        <div class="row">
+
+            <!--First column-->
+            <div class="col-md-6">
+                <h5 class="text-uppercase">Info</h5>
+                <p>Cryptocial is an experimental cryptocurrency-tweeter analyzer. It correlates tweets based
+                on their sentiment analysis and correlates with high-low real currency values.</p>
+            </div>
+            <!--/.First column-->
+
+            <!--Second column-->
+            <div class="col-md-6">
+                <h5 class="text-uppercase">About</h5>
+                <p>This project is being build for the SWE573 class in
+                    Bogazici University under the supervision of Prof. Dr. Suzan Uskudarli.</p>
+                <h5 class="text-uppercase">Links</h5>
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="https://github.com/tugcanolgun/SWE573">Github</a>
+                    </li>
+                    <li>
+                        <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a>
+                    </li>
+                </ul>
+            </div>
+            <!--/.Second column-->
+        </div>
+    </div>
+    <!--/.Footer Links-->
+
+    <!--Copyright-->
+    <div class="container-fluid bg-dark pt-2 pb-2" align="center" style="color: #fff;">
+        © 2018 Copyright:
+        <a href="/"> Cryptocial </a> | Made by Tugcan Olgun
+    </div>
+    <!--/.Copyright-->
+</div>
+<!--/.Footer-->
+</body>
+
+ <!--<script src="http://yourjavascript.com/412734182/draw.js" type="application/javascript"></script>-->
+<script src="{% static "js/draw.js" %}" type="application/javascript"></script>
+<script>
+        var res = "{{ result }}";
+        if (res !== "") {
+            drawChart(res);
+        }
+
+        else
+        {
+            drawEmptyChart();
+        }
+    </script>
+</html>

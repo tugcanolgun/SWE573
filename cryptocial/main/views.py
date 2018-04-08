@@ -1,14 +1,36 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from pathlib import Path
-# from django.template import loader
-# from django.urls import reverse
+import logging
+import json
+import coloredlogs
+import requests
 
 from .models import Crypto
 import sqlite3
 
 MAIN_DIR = str(Path().resolve().parent)
+LOG = str(Path().resolve() / "logs" / "main.log")
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+coloredlogs.install(fmt='%(asctime)s - %(name)s - %(levelname)s \t %(message)s')
+handler = logging.FileHandler(LOG, 'a',)
+handler.setLevel(logging.DEBUG)
+
+def get_client_ip(request):
+    """
+    Gets the IP address of the requester.
+    :param request:
+    :return:
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 class IndexView(generic.ListView):
     template_name = 'main/index.html'
@@ -17,49 +39,109 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return Crypto.objects.order_by('-date_added')[:5]
 
-# def index(request):
-#     cr_list = Crypto.objects.order_by('-date_added')[:5]
-#     template = loader.get_template('main/index.html')
-#     context = {
-#         'cr_list': cr_list
-#     }
-#     # return HttpResponse(template.render(context, request))
-#     return render(request, 'main/index.html', context)
-
-
-# class DetailView(generic.DetailView):
-#     model = Crypto
-#     template_name = 'polls/detail.html'
-
-def detail(request, crypto_id):
-    crypto = get_object_or_404(Crypto, pk=crypto_id)
+def get_id_from_db(short_name:str) -> int:
+    """
+    Get currency ID from shortname. Control of it being exist or not
+    will be checked on returned function
+    :param short_name:
+    :return:
+    """
     conn = sqlite3.connect(MAIN_DIR + "/database/tweets.sqlite3")
+    logger.debug("Connecting to the sqlite database")
     cursor = conn.cursor()
-    cursor.execute("SELECT Id FROM Currencies WHERE ShortName = ?", (crypto.short_name, ))
-    id = cursor.fetchone()
-    if not id:
-        # Put an error page here
-        return HttpResponse("Id could not be found")
-    else:
-        id = id[0]
-    sentiment = []
-    pos = []
-    neg = []
-    neu = []
-    com = []
-    labels = []
-    cursor.execute("SELECT Time, PosAvarage, NegAvarage, NeuAvarage, ComAvarage FROM Analysis WHERE CurrencyId = ? ORDER BY Time DESC LIMIT 15", (id, ))
-    for row in cursor.fetchall():
-        pos.append(row[1])
-        neg.append(row[2])
-        neu.append(row[3])
-        com.append(row[4])
-        sentiment.append(dict(pos=row[1], neg=row[2], neu=row[3], compound=row[4]))
+    cursor.execute("SELECT Id FROM Currencies WHERE ShortName = ?", (short_name, ))
+    logger.debug(f"Returning the id for {short_name}")
+    id: int = cursor.fetchone()
+    conn.close()
+    logger.debug(f"Closing the connection to sqlite database")
+    return id
+
+def get_results(id: int, high: list, high_value: float, low: list, low_value: float) -> (list, list):
+    """
+    Get results from ID, all assigned to variables:
+        sentiment
+        labels
+
+    Any future API changes must happen in here.
+    :param id:
+    :return:
+    """
+    sentiment: list = []
+    labels: list = []
+    conn = sqlite3.connect(MAIN_DIR + "/database/tweets.sqlite3")
+    logger.debug("Connecting to the sqlite database")
+    cursor = conn.cursor()
+    cursor.execute("SELECT Time, PosAvarage, NegAvarage, NeuAvarage, ComAvarage \
+                        FROM Analysis WHERE CurrencyId = ? ORDER BY Time DESC LIMIT 15", (id, ))
+    raw = []
+    s_high = - float("inf")
+    s_low = 0
+    for row2 in cursor.fetchall():
+        if row2[4] > s_high:
+            s_high = row2[4]
+        raw.append(row2)
+    for index, row in enumerate(raw):
+        cons = ((high_value - low_value) / (s_high - s_low))
+        pos = low_value + cons * row[1]
+        neg = low_value + cons * row[2]
+        neu = low_value + cons * row[3]
+        compound = low_value + cons * row[4]
+        sentiment.append(dict(pos=pos, neg=neg, neu=neu, compound=compound, high=high[index], low=low[index]))
         labels.append(row[0])
 
     conn.close()
-    # req = request.get("https://min-api.cryptocompare.com/data/histohour?fsym=BTC&tsym=USD&limit=15")
+    return sentiment, labels
+
+def get_currency(short_name):
+    high_value = - float("inf")
+    low_value = float("inf")
+    high = []
+    low = []
+
+    req = requests.get(f"https://min-api.cryptocompare.com/data/histohour?fsym={short_name}&tsym=USD&limit=15")
+    req = json.loads(req.text)
+    logger.info(req)
+    for value in req["Data"]:
+        if value["high"] > high_value:
+            high_value = value["high"]
+        if value["low"] < low_value:
+            low_value = value["low"]
+        high.append(value["high"])
+        low.append(value["low"])
+    return high, high_value, low, low_value
 
 
+def detail(request, crypto_id:int) -> render:
+    """
+    Detail page of the site. It gets the id and returns
+    necessary information for graph and other related
+    calculations.
+    :param request:
+    :param crypto_id:
+    :return:
+    """
+    ip: str = get_client_ip(request)
+    logger.info(f"Request for {crypto_id} from the IP: {ip}")
+    crypto = get_object_or_404(Crypto, pk=crypto_id)
+    logger.debug(f"Request for {crypto_id} found successfully")
 
-    return render(request, 'main/detail.html', {'crypto': crypto, 'result': sentiment, 'labels': labels, 'pos': pos, 'neg': neg, 'neu': neu, 'com': com, 'MAIN_DIR': MAIN_DIR})
+    id: int = get_id_from_db(crypto.short_name)
+
+    if not id:
+        # Put an error page here
+        logger.error(f"Id could not be found for shortname:{crypto.short_name}")
+        logger.error(f"Request for {crypto_id}")
+        return HttpResponse("Id could not be found")
+    else:
+        id = id[0]
+        logger.debug(f"Id fetched successfully. Id: {id}")
+
+    high, high_value, low, low_value = get_currency(crypto.short_name)
+    result, labels = get_results(id, high, high_value, low, low_value)
+
+    return render(request, 'main/detail.html', {
+                                            'result': result,
+                                            'crypto': crypto,
+                                            'low': low_value,
+                                            'high': high_value
+                                        })
