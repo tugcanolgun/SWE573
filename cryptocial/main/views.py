@@ -6,6 +6,8 @@ import logging
 import json
 import coloredlogs
 import requests
+import numpy as np
+from scipy.stats import linregress
 
 from .models import Crypto
 import sqlite3
@@ -37,7 +39,7 @@ class IndexView(generic.ListView):
     context_object_name = 'cr_list'
 
     def get_queryset(self):
-        return Crypto.objects.order_by('-date_added')[:5]
+        return Crypto.objects.order_by('date_added')[:15]
 
 def get_id_from_db(short_name:str) -> int:
     """
@@ -68,6 +70,8 @@ def get_results(id: int, high: list, high_value: float, low: list, low_value: fl
     """
     sentiment: list = []
     labels: list = []
+    pos_list: list = []
+    neg_list: list = []
     conn = sqlite3.connect(MAIN_DIR + "/database/tweets.sqlite3")
     logger.debug("Connecting to the sqlite database")
     cursor = conn.cursor()
@@ -87,10 +91,12 @@ def get_results(id: int, high: list, high_value: float, low: list, low_value: fl
         neu = low_value + cons * row[3]
         compound = low_value + cons * row[4]
         sentiment.append(dict(pos=pos, neg=neg, neu=neu, compound=compound, high=high[index], low=low[index]))
+        pos_list.append(pos)
+        neg_list.append(neg)
         labels.append(row[0])
 
     conn.close()
-    return sentiment, labels
+    return sentiment, labels, pos_list, neg_list
 
 def get_currency(short_name):
     high_value = - float("inf")
@@ -98,9 +104,8 @@ def get_currency(short_name):
     high = []
     low = []
 
-    req = requests.get(f"https://min-api.cryptocompare.com/data/histohour?fsym={short_name}&tsym=USD&limit=15")
+    req = requests.get(f"https://min-api.cryptocompare.com/data/histohour?fsym={short_name}&tsym=USD&limit=14")
     req = json.loads(req.text)
-    logger.info(req)
     for value in req["Data"]:
         if value["high"] > high_value:
             high_value = value["high"]
@@ -110,6 +115,15 @@ def get_currency(short_name):
         low.append(value["low"])
     return high, high_value, low, low_value
 
+def corr(slope, rsquare) -> str:
+    slope = abs(slope)
+    if slope > 0.2 and rsquare > 0.2:
+        text = "Correlation between data is on par!"
+    elif slope > 0.2 or rsquare > 0.2:
+        text = "Correlation between data is semi trustable"
+    else:
+        text = "There is no direct correlation between these data"
+    return text
 
 def detail(request, crypto_id:int) -> render:
     """
@@ -137,11 +151,34 @@ def detail(request, crypto_id:int) -> render:
         logger.debug(f"Id fetched successfully. Id: {id}")
 
     high, high_value, low, low_value = get_currency(crypto.short_name)
-    result, labels = get_results(id, high, high_value, low, low_value)
+    result, labels, pos, neg = get_results(id, high, high_value, low, low_value)
+    correlation = {}
+    if len(high) == len(pos):
+        c = linregress(high, pos)
+        rsquare = c.rvalue ** 2
+        text = corr(c.slope, rsquare)
+        correlation["pos"] = {"slope": c.slope,
+                "intercept": c.intercept,
+                "rvalue": c.rvalue,
+                "pvalue": c.pvalue,
+                "stderr": c.stderr,
+                }
+    logger.warning(f"{len(high)} {len(neg)}")
+    if len(high) == len(neg):
+        c = linregress(high, neg)
+        correlation["neg"] = {"slope": c.slope,
+                "intercept": c.intercept,
+                "rvalue": c.rvalue,
+                "pvalue": c.pvalue,
+                "stderr": c.stderr,
+                }
+
 
     return render(request, 'main/detail.html', {
                                             'result': result,
                                             'crypto': crypto,
                                             'low': low_value,
-                                            'high': high_value
+                                            'high': high_value,
+                                            'correlation': correlation,
+                                            'text': text
                                         })

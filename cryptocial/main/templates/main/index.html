@@ -5,18 +5,23 @@
   <h1>Cryptocial</h1>
   <p>Cryptocurrency-tweeter sentiment analysis - lead-lag correlation analyzer.</p>
 </div>
-<div class="panel panel-default">
-  <div class="panel-body">
-
+<div class="container centered">
+    <div class="container" >
+        <div class="row">
     {% if cr_list %}
-    {% for crypto in cr_list %}
-    <a href="{% url 'main:detail' crypto.id %}" >
-      <img src="https://raw.githubusercontent.com/cjdowner/cryptocurrency-icons/master/128/icon/{{ crypto.short_name|lower }}.png">
-    </a><br>
-      <a href="{% url 'main:detail' crypto.id %}" >{{crypto.name}}</a><br>
-    {% endfor %}
+        {% for crypto in cr_list %}
+            {% if forloop.counter0|divisibleby:4 %}
+            {% endif %}
+                <div class="col-lg col-offset-6 centered" >
+                    <a href="{% url 'main:detail' crypto.id %}" >
+                    <img src="https://raw.githubusercontent.com/cjdowner/cryptocurrency-icons/master/128/icon/{{ crypto.short_name|lower }}.png">
+                    </a><br>
+                    <a href="{% url 'main:detail' crypto.id %}" >{{crypto.name}}</a><br>
+                </div>
+        {% endfor %}
     {% endif %}
-  </div>
+        </div>
+    </div>
 </div>
 </div>
 {% endblock %}

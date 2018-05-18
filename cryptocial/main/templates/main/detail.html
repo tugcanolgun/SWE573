@@ -8,8 +8,6 @@
     <div class="container">
         <canvas id="result_chart"></canvas>
         <br>
-        {{ high }}
-        {{ low }}
         <div class="card text-center">
             <div class="card-header">
                 <img src="https://raw.githubusercontent.com/cjdowner/cryptocurrency-icons/master/128/icon/{{ crypto.short_name|lower }}.png">
@@ -18,7 +16,38 @@
                 <h5 class="card-title">{{ crypto.name }}</h5>
             </div>
             <div class="card-footer text-muted">
-                Correlation data has not been calculated yet. Please check later.
+                Graph High: {{ high }} // Graph Low: {{ low }}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Analysis</th>
+                            <th>Slope</th>
+                            <th>Intercept</th>
+                            <th>Rvalue</th>
+                            <th>Pvalue</th>
+                            <th>Stderr</th>
+                        </tr>
+                        </thead>
+                        
+                        <tbody>
+                        {% for key, value in correlation.items %}
+                        <tr>
+
+                            {% if key == "pos" %}
+                                <td>Positive/High</td>
+                            {% elif key == "neg" %}
+                                <td>Negative/High</td>
+                            {% endif %}
+                            {% for content in value.values %}
+                                <td>{{content|floatformat:6}}</td>
+                            {% endfor %}
+                        </tr>
+                {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <b>Result:</td> {{text}}
             </div>
         </div>
     </div>

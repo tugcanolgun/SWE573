@@ -69,7 +69,36 @@ function drawChart(result) {
                     fill: false
                 }
             ]
+        },
+
+        options: {
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                    display: true,
+                    labelString: 'Hour'
+                }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                    display: true,
+                    labelString: 'Dollar'
+                }
+                }]
+            }
         }
+
+
+
+
+
+
+
+
+        
+
     })
 }
 

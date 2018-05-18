@@ -128,7 +128,7 @@ class Twitter:
                 logger.error(str(err))
             except:
                 logger.error("Something went wrong")
-            system("python3.6 sentiment.py --coin %s &" % currency)
+            system("../venv/bin/python3 sentiment.py --coin %s &" % currency)
             sleep(90)
         logger.info("Tweets are added")
         CURRENCIES = []
