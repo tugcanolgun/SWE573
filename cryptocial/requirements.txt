@@ -2,7 +2,7 @@ attrs==17.4.0
 certifi==2018.4.16
 chardet==3.0.4
 coloredlogs==9.3.1
-Django==2.0.3
+Django==2.2.13
 gunicorn==19.8.1
 humanfriendly==4.12
 idna==2.6
